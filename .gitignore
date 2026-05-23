@@ -1,0 +1,49 @@
+# ──────────────────────────────────────────────────────────────
+#  Tracked:  backend/ (source code), requirements.txt,
+#            .env.example, .gitignore
+#  Ignored:  everything else (see below)
+# ──────────────────────────────────────────────────────────────
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE / editor
+.idea/
+.vscode/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Planning documents (not part of the codebase)
+# ARCHITECTURE_FINAL.md is intentionally kept tracked — meant to be shared.
+/CONCEPT_FINAL.md
+/BACKEND_PLAN.md
+
+# Source PDFs, photos, and tabular data (out of project structure)
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.csv
+
+# Data artifacts at the project root (e.g. contractors_geocoded.json)
+/*.json
+
+# Scripts that live at the root, outside backend/ (e.g. geocoding.py)
+/*.py

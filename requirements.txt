@@ -1,0 +1,13 @@
+# Phase 1–2 (database client + contractor geocoding/seeding)
+pandas
+requests
+supabase
+python-dotenv
+
+# Later phases will add:
+#   pdfplumber          # Phase 3 text extraction
+#   PyMuPDF             # Phase 3 photo extraction
+#   google-generativeai # Phase 4/5 Gemini calls
+#   pydantic            # Phase 4 schema enforcement
+#   pyproj              # Phase 5 coordinate conversion
+#   numpy               # Phase 5 trend regression
