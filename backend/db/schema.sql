@@ -9,7 +9,7 @@ create extension if not exists pgcrypto;  -- gen_random_uuid()
 -- DESTRUCTIVE RESET — uncomment to wipe and rebuild during development.
 -- ---------------------------------------------------------------------------
 -- drop table if exists extraction_jobs cascade;
--- drop table if exists massnahmen     cascade;
+-- drop table if exists empfehlungen    cascade;
 -- drop table if exists schaeden       cascade;
 -- drop table if exists pruefungen     cascade;
 -- drop table if exists contractors    cascade;
@@ -34,6 +34,9 @@ create table bridges (
   -- location
   lat                         double precision,       -- WGS84, from pyproj
   lon                         double precision,
+  coord_source                text check (coord_source in ('utm','geocoded')),
+                                                       -- 'utm' = exact (from doc);
+                                                       -- 'geocoded' = approximate (address lookup)
   utm_rechtswert              double precision,
   utm_hochwert                double precision,
   utm_bezugssystem            text,                    -- drives UTM zone (32N/33N)
@@ -73,13 +76,16 @@ create table bridges (
 
   -- denormalized current state (latest pruefung / worst schaden)
   aktuelle_zustandsnote       numeric(3,1),
-  aktuelle_substanznote       numeric(3,1),
   aktuelle_pruefung_datum     date,
   aktuelle_pruefung_art       text,
   naechste_hauptpruefung_faellig int,
   max_s                       smallint check (max_s between 0 and 4),
   max_v                       smallint check (max_v between 0 and 4),
   max_d                       smallint check (max_d between 0 and 4),
+  -- 7.5 Bewertung — verbatim explanation under each max S/V/D (popover in UI)
+  max_s_begruendung           text,
+  max_v_begruendung           text,
+  max_d_begruendung           text,
 
   -- scoring (Phase 5)
   priority_score              numeric,                 -- 0–1
@@ -116,7 +122,6 @@ create table pruefungen (
   art           text,                                   -- Haupt/Einfache/Sonder
   datum         date,
   zustandsnote  numeric(3,1),
-  substanznote  numeric(3,1),
   zyklus_monate int
 );
 create index on pruefungen (bridge_id);
@@ -142,22 +147,22 @@ create index on schaeden (bridge_id);
 -- query-time sort: order by s desc, v desc, d desc
 
 -- ============================================================
--- massnahmen — past maintenance (1 bridge : many)
+-- empfehlungen — section 7.6 Maßnahmenempfehlungen (1 bridge : many)
+-- Inspector's recommended measures, each linked to the damages it addresses.
+-- (Replaces the old 8.3 massnahmen table: 7.6 carries the damage link.)
 -- ============================================================
-create table massnahmen (
-  id            uuid primary key default gen_random_uuid(),
-  bridge_id     uuid not null references bridges(id) on delete cascade,
-  massnahme_nr  text,                                   -- {N} internal ref
-  jahr          int,
-  art           text,
-  beschreibung  text,
-  auftragnehmer text,                                   -- historical contractor
-  auftragssumme numeric,
-  waehrung      text check (waehrung in ('DM','EUR')),
-  flaeche_m2    numeric,
-  bemerkung     text
+create table empfehlungen (
+  id                     uuid primary key default gen_random_uuid(),
+  bridge_id              uuid not null references bridges(id) on delete cascade,
+  nr                     int,                            -- the {n} recommendation id
+  art_der_leistung       text,
+  dringlichkeit          text,
+  geschaetzte_kosten_eur numeric,
+  ausfuehrungsjahr       int,
+  bemerkung              text,
+  zugeordnete_schaeden   int[] not null default '{}'    -- damage [n] ids this measure addresses
 );
-create index on massnahmen (bridge_id);
+create index on empfehlungen (bridge_id);
 
 -- ============================================================
 -- extraction_jobs — one row per processed PDF (audit + resumability)

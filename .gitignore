@@ -6,9 +6,6 @@
 
 # Secrets
 .env
-.env.*
-!.env.example
-
 # Python
 __pycache__/
 *.py[cod]
@@ -47,3 +44,6 @@ Thumbs.db
 
 # Scripts that live at the root, outside backend/ (e.g. geocoding.py)
 /*.py
+
+pdfs
+Presentation

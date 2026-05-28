@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===========================================================================
+   BrückenPilot design system — "fusedash" inspired.
+   Light = soft lavender-grey + white cards. Dark = near-black navy + glass.
+   Accent = violet→indigo. Urgency = green/amber/orange/red.
+   =========================================================================== */
+@layer base {
+  :root {
+    --background: 240 33% 97%;
+    --foreground: 230 25% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 230 25% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 230 25% 14%;
+    --primary: 256 78% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 20% 92%;
+    --secondary-foreground: 230 25% 20%;
+    --muted: 240 18% 91%;
+    --muted-foreground: 232 14% 40%;
+    --accent: 256 80% 96%;
+    --accent-foreground: 256 60% 42%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 16% 82%;
+    --input: 240 16% 82%;
+    --ring: 256 78% 60%;
+    --radius: 0.9rem;
+
+    /* gradients + map */
+    --grad-from: 256 84% 64%;
+    --grad-to: 222 90% 60%;
+    --map-bg: 240 30% 96%;
+    --map-region: 240 24% 88%;
+    --map-region-hover: 256 50% 82%;
+    --map-stroke: 240 14% 65%;
+  }
+
+  .dark {
+    --background: 228 22% 7%;
+    --foreground: 220 22% 95%;
+    --card: 228 17% 11%;
+    --card-foreground: 220 22% 95%;
+    --popover: 228 18% 12%;
+    --popover-foreground: 220 22% 95%;
+    --primary: 255 88% 70%;
+    --primary-foreground: 228 25% 8%;
+    --secondary: 228 14% 16%;
+    --secondary-foreground: 220 22% 95%;
+    --muted: 228 14% 16%;
+    --muted-foreground: 220 12% 62%;
+    --accent: 228 16% 19%;
+    --accent-foreground: 220 22% 95%;
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 228 13% 19%;
+    --input: 228 13% 19%;
+    --ring: 255 88% 70%;
+
+    --grad-from: 256 90% 70%;
+    --grad-to: 217 91% 62%;
+    --map-bg: 228 24% 6%;
+    --map-region: 228 16% 22%;
+    --map-region-hover: 255 40% 24%;
+    --map-stroke: 228 14% 42%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  html, body, #root {
+    height: 100%;
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+@layer components {
+  /* Frosted-glass card used across widgets */
+  .glass {
+    background-color: hsl(var(--card) / 0.72);
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--border) / 0.7);
+  }
+  .grad-text {
+    background-image: linear-gradient(135deg, hsl(var(--grad-from)), hsl(var(--grad-to)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .grad-bg {
+    background-image: linear-gradient(135deg, hsl(var(--grad-from)), hsl(var(--grad-to)));
+  }
+}
+
+/* glowing/pulsing map markers */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 var(--pulse, rgba(239,68,68,0.5)); }
+  70%  { box-shadow: 0 0 0 12px rgba(0,0,0,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in-up { animation: fade-in-up 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: hsl(var(--muted-foreground) / 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground) / 0.5); }
+
+/* MapLibre chrome cleanup — keep it schematic */
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-logo { display: none !important; }
+.maplibregl-canvas { outline: none; }
+
+/* themed zoom controls */
+.maplibregl-ctrl-group {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+  margin: 16px !important;
+}
+.maplibregl-ctrl-group button {
+  width: 34px !important;
+  height: 34px !important;
+  background: transparent !important;
+}
+.maplibregl-ctrl-group button:hover { background: hsl(var(--accent)) !important; }
+.maplibregl-ctrl-group button + button { border-top: 1px solid hsl(var(--border)) !important; }
+.dark .maplibregl-ctrl-group button .maplibregl-ctrl-icon { filter: invert(1) hue-rotate(180deg); }

@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrückenPilot — How It Works</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0e17;
+      --bg-card: #121729;
+      --bg-card-hover: #1a2038;
+      --border: #1e2a4a;
+      --text: #e2e8f0;
+      --text-muted: #8892a8;
+      --accent: #ff0000;
+      --accent-light: #a78bfa;
+      --gradient-from: #7c5cfc;
+      --gradient-to: #3b82f6;
+      --green: #22c55e;
+      --amber: #eab308;
+      --orange: #f97316;
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Layout ─── */
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      color: white; font-size: 13px; font-weight: 700;
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 28px; letter-spacing: 0.03em;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      font-weight: 900; letter-spacing: -0.03em;
+      line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--text-muted);
+      max-width: 620px; margin: 0 auto;
+    }
+
+    /* ─── Section ─── */
+    section { padding: 80px 0; }
+    .section-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.15em; color: var(--accent-light); margin-bottom: 12px;
+    }
+    section h2 {
+      font-size: 2rem; font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 16px; line-height: 1.2;
+    }
+    section > .container > p {
+      color: var(--text-muted); font-size: 1.05rem; max-width: 680px;
+      margin-bottom: 40px;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .card:hover { background: var(--bg-card-hover); border-color: #2a3a5e; }
+    .card h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card p { color: var(--text-muted); font-size: 0.92rem; }
+
+    .card-grid { display: grid; gap: 16px; }
+    .card-grid-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .card-grid-3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+    /* ─── Step indicator ─── */
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 10px; font-size: 14px; font-weight: 800;
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      color: white; flex-shrink: 0;
+    }
+
+    /* ─── Pipeline ─── */
+    .pipeline { position: relative; }
+    .pipeline-line {
+      position: absolute; left: 39px; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+    }
+    .pipeline-step {
+      display: flex; gap: 24px; padding: 24px 0;
+      position: relative;
+    }
+    .pipeline-dot {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+      background: var(--bg); border: 3px solid var(--accent);
+      margin-top: 4px; position: relative; z-index: 1;
+    }
+    .pipeline-dot.active { background: var(--accent); box-shadow: 0 0 16px rgba(124,92,252,0.5); }
+    .pipeline-content h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+    .pipeline-content p { color: var(--text-muted); font-size: 0.9rem; }
+
+    /* ─── Challenge block ─── */
+    .challenge {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 20px;
+    }
+    .challenge-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 14px;
+    }
+    .challenge-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .challenge-icon.problem { background: rgba(239,68,68,0.15); }
+    .challenge-icon.solution { background: rgba(34,197,94,0.15); }
+    .challenge h4 { font-weight: 700; font-size: 1rem; }
+    .challenge p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; }
+    .challenge ul { color: var(--text-muted); font-size: 0.9rem; padding-left: 20px; }
+    .challenge li { margin-bottom: 6px; }
+    .challenge li strong { color: var(--text); }
+
+    /* ─── Tags ─── */
+    .tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+      background: rgba(124,92,252,0.12); color: var(--accent-light);
+      border: 1px solid rgba(124,92,252,0.2);
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      height: 1px; background: var(--border); margin: 0;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      padding: 60px 0 40px; text-align: center;
+      color: var(--text-muted); font-size: 0.85rem;
+    }
+
+    /* ─── Flow diagram ─── */
+    .flow {
+      display: flex; align-items: center; gap: 12px;
+      flex-wrap: wrap; margin-bottom: 32px;
+    }
+    .flow-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 18px; font-size: 0.85rem; font-weight: 600;
+      white-space: nowrap;
+    }
+    .flow-arrow { color: var(--accent); font-size: 20px; font-weight: 700; }
+
+    /* ─── Stat bar ─── */
+    .stats {
+      display: flex; gap: 32px; flex-wrap: wrap; margin: 40px 0;
+      justify-content: center;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 2.2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--gradient-from), var(--gradient-to));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-badge">🌉 Engineering Deep Dive</div>
+      <h1>How <span>BrückenPilot</span> Works</h1>
+      <p>From PDF documents sitting in filing cabinets to an intelligent, map-based infrastructure monitoring platform — fully automated.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-value">8</div><div class="stat-label">Pipeline Stages</div></div>
+        <div class="stat"><div class="stat-value">2</div><div class="stat-label">LLM Calls per PDF</div></div>
+        <div class="stat"><div class="stat-value">0</div><div class="stat-label">Manual Steps</div></div>
+        <div class="stat"><div class="stat-value">100%</div><div class="stat-label">Traceable to Source</div></div>
+      </div>
+    </div>
+  </header>
+
+  <hr class="divider">
+
+  <!-- ═══════════ PROBLEM ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Problem</div>
+      <h2>Bridge data exists. It's trapped in PDFs.</h2>
+      <p>
+        German bridges are inspected under DIN 1076 every six years. Each inspection produces a
+        <strong>Bauwerksbuch</strong> — a structured PDF of 20–30 pages containing physical attributes,
+        full inspection history, individual damage records with photos, and maintenance history.
+        The data is there. Nobody is turning it into decisions.
+      </p>
+      <p>
+        In December 2021, the Rahmedetalbrücke on the A45 collapsed and closed overnight.
+        The structural decline was visible in the inspection history for years. Nobody connected
+        it to an action in time. BrückenPilot exists to close that gap.
+      </p>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════ CONTRACTOR DATA ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">Phase 0 — Data Acquisition</div>
+      <h2>Building the contractor database from scratch</h2>
+      <p>
+        Before any bridge can be matched with qualified repair firms, we needed a database
+        of active, PQ-certified contractors across Germany. This database didn't exist in a usable form.
+      </p>
+
+      <div class="flow">
+        <div class="flow-box">🌐 PQ-Verein Website</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">📋 Multiple CSVs</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">🔀 Merge & Deduplicate</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">📍 Geocode</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">💾 Supabase</div>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-header">
+          <div class="challenge-icon problem">🔍</div>
+          <h4>Where to find qualified bridge contractors?</h4>
+        </div>
+        <p>
+          The <strong>PQ-Verein</strong> (Präqualifizierungsverein) maintains the official German public
+          construction registry. We downloaded multiple CSV exports filtered by bridge-relevant
+          Leistungsbereiche (service categories) — prestressed concrete work, steel construction,
+          corrosion protection, concrete rehabilitation, waterproofing, and full-service bridge construction.
+        </p>
+        <p>
+          These CSVs were combined into a single clean dataset: duplicates removed by PQ-Nummer,
+          service categories merged per firm, and address fields normalized.
+        </p>
+      </div>
+
+      <div class="challenge">
+        <div class="challenge-header">
+          <div class="challenge-icon solution">📍</div>
+          <h4>Turning addresses into map coordinates</h4>
+        </div>
+        <p>
+          Every contractor needed GPS coordinates for proximity filtering. We used the
+          <strong>OpenStreetMap Nominatim</strong> geocoder with a multi-level fallback strategy:
+        </p>
+        <ul>
+          <li><strong>Full address</strong> — street + postal code + city (highest precision)</li>
+          <li><strong>City-center fallback</strong> — postal code + city only (when the street wasn't found)</li>
+          <li>Rate-limited to 1 request/second, with exponential backoff on errors</li>
+          <li>Failures logged to a separate CSV for manual review</li>
+        </ul>
+        <p>
+          The result: a geocoded JSON of all qualified bridge contractors across Germany, upserted
+          into the database once and reused for every bridge analysis.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════ PIPELINE OVERVIEW ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Core Engine</div>
+      <h2>From PDF to structured intelligence in 8 steps</h2>
+      <p>
+        The batch pipeline processes each Bauwerksbuch PDF through a deterministic, auditable sequence.
+        Every step is isolated — a failure in one PDF doesn't affect the rest.
+        A SHA-256 hash ensures idempotent re-runs.
+      </p>
+
+      <div class="pipeline" style="padding-left: 30px;">
+        <div class="pipeline-line"></div>
+
+        <!-- Step 1 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">1</span>&nbsp; Text Extraction</h3>
+            <p>
+              The PDF's text layer is read with full page markers for source linking.
+              If the average characters per page is below 50, the PDF is flagged as a
+              <strong>scan</strong> — an image-only document with no selectable text.
+              In that case, every page is OCR'd using Tesseract with the German language
+              model. If OCR still yields nothing, the PDF is marked as failed and the batch
+              moves on.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">2</span>&nbsp; Photo Extraction</h3>
+            <p>
+              Section 7.4 (Schäden) is located in the document, and inspection photos are
+              extracted from that range. <strong>Digital PDFs</strong> yield clean embedded
+              image objects. <strong>Scanned PDFs</strong> are trickier — photos may be
+              embedded among rasterized text strips (filtered by minimum pixel size), or
+              stitched from vertical tile-pairs that need merging. When nothing is embedded,
+              a layout detection model (DocLayout-YOLO) crops the figure regions directly.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">3</span>&nbsp; Structured LLM Extraction</h3>
+            <p>
+              The full page-tagged text is sent to a large language model in a single call.
+              The model returns a fully structured record: bridge identity, UTM coordinates,
+              complete inspection history, every individual damage with its severity ratings
+              and photo references, and all past maintenance work — all validated against
+              a strict schema. Domain sanity gates reject nonsensical outputs (missing
+              Bauwerksnummer, grades outside 1.0–4.0).
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3b -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">3b</span>&nbsp; Photo–Damage Matching</h3>
+            <p>
+              Each damage carries a photo reference ("Bild:") that also appears in the
+              caption below its photo. This binding is <strong>deterministic — no LLM,
+              no pixel heuristics</strong>. For digital PDFs, the caption is read from the
+              text layer and matched by leading-token prefix. For scans, the caption is
+              OCR'd and matched by IDF-weighted shared tokens, requiring a token unique to
+              one caption — which keys on the discriminating ID number and ignores
+              boilerplate. A damage with no confident match simply gets no photo (honest
+              over guessing).
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">4</span>&nbsp; Coordinate Conversion</h3>
+            <p>
+              Bridge locations in the document are typically in UTM (ETRS89). These are
+              converted to WGS84 (GPS coordinates) with the correct zone based on the
+              document's reference system. When no UTM coordinates exist (older documents),
+              the bridge address is geocoded as an approximate map pin — clearly marked
+              as "geocoded" vs. "exact" in the data.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">5</span>&nbsp; Priority Scoring</h3>
+            <p>
+              Every bridge receives a composite priority score (0–1) from three factors:
+              <strong>Condition</strong> (current grade + severity boost), <strong>Criticality</strong>
+              (road class, traffic volume, detour difficulty), and <strong>Deterioration Trend</strong>
+              (linear regression on historical grades, with a material-age fallback for sparse data).
+              The full breakdown is stored for transparency — every number is explainable.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">6</span>&nbsp; Contractor Capability Matching</h3>
+            <p>
+              Based on the specific damages found, the system determines which PQ service
+              categories are needed for repair. This capability set is stored on the bridge
+              record and used by the frontend to filter qualified contractors — combined
+              with distance calculated in the browser for real-time proximity filtering.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 7 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">7</span>&nbsp; Intelligent Summary</h3>
+            <p>
+              A second LLM call generates a three-part assessment using the now-complete
+              bridge record including matched photos: <strong>Situation</strong> (current state),
+              <strong>Risks</strong> (what could deteriorate), and <strong>Recommendation</strong>
+              (intervention type with cost range). This is the only generated prose —
+              everything else is structured data.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 8 -->
+        <div class="pipeline-step">
+          <div class="pipeline-dot active"></div>
+          <div class="pipeline-content">
+            <h3><span class="step-num">8</span>&nbsp; Persist to Database</h3>
+            <p>
+              The original PDF, matched photos, and all structured data are uploaded to
+              cloud storage and upserted into the database. The operation is fully
+              idempotent — re-processing the same PDF overwrites cleanly without creating
+              duplicates. Child records (inspections, damages, maintenance) are replaced
+              atomically.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════ ENGINEERING CHALLENGES ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">Engineering Challenges</div>
+      <h2>Problems we solved along the way</h2>
+      <p>
+        Real-world PDFs don't cooperate. Every German state has a different template,
+        documents span decades of formatting conventions, and scanned documents break
+        every assumption about machine-readable text.
+      </p>
+
+      <div class="card-grid card-grid-2">
+        <div class="card">
+          <h3>
+            <span class="tag">📄 Ingestion</span>
+          </h3>
+          <h3>Scanned vs. Digital PDFs</h3>
+          <p>
+            Digital PDFs have a text layer — read it directly. Scanned PDFs are images
+            with no selectable text. The system auto-detects which type it's dealing with
+            and switches to OCR. For photos, scans may embed images as stacked vertical
+            tiles that need stitching, or as completely flat rasters requiring layout-model
+            cropping.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>
+            <span class="tag">📸 Matching</span>
+          </h3>
+          <h3>Photos Without Metadata</h3>
+          <p>
+            PDFs embed photos as raw image objects — no filename, no caption attached.
+            The system reads the text directly below each photo's bounding box, clips it
+            to the photo's column to avoid bleeding from adjacent layouts, and matches it
+            against the "Bild:" reference the LLM extracted from the damage record.
+            Two different algorithms handle digital and scanned documents.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>
+            <span class="tag">🗺️ Coordinates</span>
+          </h3>
+          <h3>16 States, Multiple Coordinate Systems</h3>
+          <p>
+            Bridge documents use UTM coordinates with different reference systems
+            (zone 32N or 33N depending on geography). The system reads the reference
+            system from the document, selects the correct EPSG projection, and converts
+            to GPS. When coordinates are missing entirely, address geocoding provides a
+            usable fallback.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>
+            <span class="tag">🧠 Extraction</span>
+          </h3>
+          <h3>One LLM Call per Document</h3>
+          <p>
+            The entire document text is processed in a single LLM call with strict
+            schema enforcement. This avoids the cascading errors of multi-step extraction
+            and ensures every field — from bridge dimensions to individual damage photo
+            references — is extracted in context. Domain gates catch hallucinated or
+            structurally invalid output before it reaches the database.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>
+            <span class="tag">🏗️ Contractors</span>
+          </h3>
+          <h3>Historical vs. Available Firms</h3>
+          <p>
+            The PDF contains past contractors who worked on the bridge — but they may no
+            longer exist. BrückenPilot separates these clearly: historical firms are shown
+            as factual records, while the Contractors tab shows currently active,
+            PQ-qualified firms matched by capability and proximity. Two completely
+            different data sources, one clear interface.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>
+            <span class="tag">🔄 Operations</span>
+          </h3>
+          <h3>Idempotent Everything</h3>
+          <p>
+            Every operation — from PDF upload to database upsert — is designed for safe
+            re-runs. Storage paths are deterministic (derived from the Bauwerksnummer),
+            database writes use upsert-on-natural-key, and the batch runner tracks
+            SHA-256 hashes to skip already-processed files. A crashed overnight run simply
+            resumes where it left off.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════ FRONTEND ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Interface</div>
+      <h2>From data to decisions</h2>
+      <p>
+        The frontend is a real-time monitoring dashboard that reads directly from the database.
+        No backend server required — the browser talks to Supabase with row-level security.
+      </p>
+
+      <div class="card-grid card-grid-3">
+        <div class="card">
+          <h3>🗺️ Interactive Map</h3>
+          <p>
+            Every bridge plotted on a choropleth map of Germany. States are tinted by their
+            worst-urgency bridge. Markers pulse for critical condition. Click to inspect.
+          </p>
+        </div>
+        <div class="card">
+          <h3>📊 Priority Dashboard</h3>
+          <p>
+            Condition grade, priority score with full factor breakdown, inspection history
+            chart, estimated costs, and AI-generated risk assessment — all in one panel.
+          </p>
+        </div>
+        <div class="card">
+          <h3>🔍 Damage Inspector</h3>
+          <p>
+            Every damage record with severity ratings (S/V/D), location description,
+            and matched inspection photos with a full-screen lightbox viewer.
+          </p>
+        </div>
+        <div class="card">
+          <h3>🏢 Contractor Finder</h3>
+          <p>
+            Active PQ-qualified firms filtered by distance slider and matched by the
+            specific repair capabilities the bridge needs. All computed in the browser.
+          </p>
+        </div>
+        <div class="card">
+          <h3>📄 Source PDF Access</h3>
+          <p>
+            One click opens the original Bauwerksbuch PDF. Every extracted value is
+            traceable back to its source page — the ultimate audit trail.
+          </p>
+        </div>
+        <div class="card">
+          <h3>🌗 Adaptive Theme</h3>
+          <p>
+            Full dark and light mode with a design system built on HSL CSS variables.
+            Glassmorphism cards, gradient accents, and smooth micro-animations throughout.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ═══════════ TECH STACK ═══════════ -->
+  <section>
+    <div class="container">
+      <div class="section-label">Technology</div>
+      <h2>Built with</h2>
+
+      <div class="card-grid card-grid-2">
+        <div class="card">
+          <h3>Pipeline</h3>
+          <p>
+            Python · pdfplumber · PyMuPDF · Tesseract OCR · DocLayout-YOLO ·
+            pyproj · Pydantic v2 · Gemini 2.0 Flash / Llama 4 Maverick
+          </p>
+        </div>
+        <div class="card">
+          <h3>Frontend</h3>
+          <p>
+            React 19 · TypeScript · Vite · Tailwind CSS · MapLibre GL ·
+            Recharts · Framer Motion · TanStack Query · Radix UI
+          </p>
+        </div>
+        <div class="card">
+          <h3>Infrastructure</h3>
+          <p>
+            Supabase (Postgres + Storage + Row-Level Security) ·
+            Nominatim geocoding · PQ-Verein contractor registry
+          </p>
+        </div>
+        <div class="card">
+          <h3>Design Principles</h3>
+          <p>
+            Zero manual steps · Idempotent re-runs · Source-linked extraction ·
+            Honest over guessing · Batch isolation (one PDF failure ≠ batch failure)
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p>BrückenPilot — Turning bridge inspection PDFs into infrastructure intelligence.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

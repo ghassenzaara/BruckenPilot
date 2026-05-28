@@ -8,6 +8,7 @@ coordinates are skipped (a contractor with no location can't be distance-filtere
 and reported at the end.
 """
 import json
+import math
 
 from backend import config
 from backend.db.client import get_client
@@ -15,15 +16,23 @@ from backend.db.client import get_client
 CHUNK = 100
 
 
+def clean(v):
+    """NaN/Infinity (from pandas via json.load) -> None; strict JSON can't encode them."""
+    if isinstance(v, float) and not math.isfinite(v):
+        return None
+    return v
+
+
 def parse_leistungsbereiche(raw):
     """'311_01,613_01' -> ['311_01', '613_01']. Stored verbatim (underscore form)."""
+    raw = clean(raw)
     if not raw:
         return []
     return [code.strip() for code in str(raw).split(",") if code.strip()]
 
 
 def build_row(record):
-    return {
+    row = {
         "pq_nummer": record.get("pq_nummer"),
         "firmenname": record.get("firmenname"),
         "strasse": record.get("strasse"),
@@ -37,6 +46,7 @@ def build_row(record):
         "leistungsbereiche": parse_leistungsbereiche(record.get("leistungsbereiche")),
         "spezialisierungen": record.get("spezialisierungen"),
     }
+    return {k: clean(v) for k, v in row.items()}
 
 
 def main():
@@ -54,7 +64,7 @@ def main():
         if not rec.get("pq_nummer"):
             skipped_no_pq += 1
             continue
-        if rec.get("lat") is None or rec.get("lon") is None:
+        if clean(rec.get("lat")) is None or clean(rec.get("lon")) is None:
             skipped_no_coords += 1
             continue
         rows.append(build_row(rec))

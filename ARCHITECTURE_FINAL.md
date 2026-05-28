@@ -15,7 +15,7 @@ flowchart TD
             TABS["Tabs: [ General Info ] [ Contractors ]"]
 
             subgraph GENERAL["General Info Tab"]
-                INFO["Bridge attributes\nZustandsnote / Substanznote / Δ\nLetzte Prüfung / Nächste HP\nLänge / Breite / Fläche\nDTV / LKW / Baulast / Amt"]
+                INFO["Bridge attributes\nZustandsnote / Δ\nLetzte Prüfung / Nächste HP\nLänge / Breite / Fläche\nDTV / LKW / Baulast / Amt"]
                 SUMMARY["Intelligent Summary\n🔧 Situation\n⚠️ Risiken\n💰 Empfehlung"]
                 MASSNAHMEN["Bau- und Erhaltungsmaßnahmen\nHistorical contractors from PDF\n1981 W+R Eurodienst — Korrosionsschutz\n1981 Leit-Ramm — Schutzeinrichtungen"]
             end
@@ -33,8 +33,8 @@ flowchart TD
         end
 
         subgraph HISTORY["Prüfungshistorie Page"]
-            CHART["Dual-line Chart (Recharts)\nZustandsnote + Substanznote\nHistorical points + Linear projection\nCI band · Thresholds at 3.0 and 3.5"]
-            PTABLE["Inspection Table\nDatum · Art · Zustandsnote · Substanznote\nMost recent first"]
+            CHART["Zustandsnote Chart (Recharts)\nHistorical points + Linear projection\nCI band · Thresholds at 3.0 and 3.5"]
+            PTABLE["Inspection Table\nDatum · Art · Zustandsnote\nMost recent first"]
         end
 
     end
@@ -51,7 +51,7 @@ flowchart TD
         P2["2. PyMuPDF\nExtract embedded\nSchäden photos"]
         P3["3. Gemini 2.0 Flash — Call 1\nStructured extraction\nPydantic schema · temp=0.0"]
         P4["4. pyproj\nUTM ETRS89 → WGS84\nEPSG:25832 zone 32N"]
-        P5["5. Scoring engine\nCondition × Criticality\n× Trend × CostFactor"]
+        P5["5. Scoring engine\nCondition × Criticality"]
         P6["6. Contractor matching\nFilter DB by Leistungsbereich\nRank by haversine distance"]
         P7["7. Gemini 2.0 Flash — Call 2\nIntelligent summary\nSituation · Risiken · Empfehlung"]
         P8["8. Supabase upsert\nbridges · pruefungen\nschaeden · massnahmen\nUpdate job → completed"]
@@ -64,7 +64,7 @@ flowchart TD
 
         subgraph DB["PostgreSQL"]
             T_BRIDGES[("bridges\nIdentity · Location · Structure\nGrades · Priority · Summary")]
-            T_PRUEF[("pruefungen\nart · datum\nzustandsnote · substanznote")]
+            T_PRUEF[("pruefungen\nart · datum\nzustandsnote")]
             T_SCHAD[("schaeden\nschaden_nr · bsp_id · bauteil\nbeschreibung · ort · s · v · d\nfoto_id · foto_storage_path")]
             T_MASS[("massnahmen\nmassnahme_nr · jahr · art\nauftragnehmer · auftragssumme")]
             T_JOBS[("extraction_jobs\nstatus · status_message\nbridge_id · timings · tokens")]

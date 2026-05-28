@@ -1,7 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(& \"C:\\\\TU\\\\Projects\\\\Tim\\\\.venv\\\\Scripts\\\\python.exe\" -m pip install -r \"C:\\\\TU\\\\Projects\\\\Tim\\\\requirements.txt\" --quiet)"
+      "PowerShell(& \"C:\\\\TU\\\\Projects\\\\Tim\\\\.venv\\\\Scripts\\\\python.exe\" -m pip install -r \"C:\\\\TU\\\\Projects\\\\Tim\\\\requirements.txt\" --quiet)",
+      "Bash(mv germany-states.geojson germany-states.json)",
+      "Read(//c/c/TU/Projects/Tim/frontend/src/**)",
+      "Bash(npm run *)",
+      "Bash(python -m pip list)",
+      "Bash(command -v tesseract)",
+      "Bash(python *)",
+      "WebFetch(domain:docs.digitalocean.com)",
+      "WebFetch(domain:www.bast.de)",
+      "Bash(npx tsc *)",
+      "PowerShell(python _schaden_probe.py)",
+      "PowerShell(python C:\\\\TU\\\\Projects\\\\Tim\\\\_schaden_probe.py)",
+      "PowerShell(python C:\\\\TU\\\\Projects\\\\Tim\\\\_dump_section.py Anl_02)"
     ]
   }
 }
